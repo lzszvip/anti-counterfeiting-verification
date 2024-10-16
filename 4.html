@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防伪溯源</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 0px 12px 12px
+        }
+        .content {
+            padding: 15px;
+        }
+        h1 {
+            font-size: 18px;
+            margin: 0 0 12px 0;
+            font-weight: 600;
+        }
+        .verification-box {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            /* padding: 0 15px; */
+        }
+        .message {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .code {
+            /* font-weight: bold; */
+            margin-top: 0px;
+        }
+        .audio-player {
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+        .play-button {
+            width: 30px;
+            height: 30px;
+            background-color: #00c853;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            margin-right: 15px;
+            background-size: 60%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .timeline {
+            flex: 1;
+            height: 4px;
+            background-color: #e0e0e0;
+            position: relative;
+            margin: 0 15px;
+            cursor: pointer;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #00c853;
+            position: absolute;
+            transition: width 0.1s linear;
+        }
+        .progress::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background-color: #00c853;
+            border-radius: 50%;
+            position: absolute;
+            right: -6px;
+            top: -4px;
+        }
+        .time {
+            font-size: 12px;
+            color: #757575;
+            min-width: 40px;
+            text-align: center;
+        }
+        .center {
+            display: grid;
+            place-items: center;
+        }
+        .center2 {
+            display: grid;
+            place-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin-top: 12px; margin-bottom: 12px">
+        <div class="container">
+            <div class="content">
+                <div>防伪验证</div>
+                <div class="verification-box">
+                    <img src="./static/d.jpg" alt="验证图标" style="margin-right: 12px; margin-top: 10px">
+                    <div class="message">
+                        您好！您所查询的是正牌产品，请放心使用，感谢您的大力支持！
+                        <div class="code">防伪码：79784316572</div>
+                    </div>
+                </div>
+                <div class="audio-player">
+                    <button class="play-button" id="playPauseBtn"></button>
+                    <span class="time" id="currentTime">00:00</span>
+                    <div class="timeline" id="timeline">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <span class="time" id="duration">00:00</span>
+                    <audio id="audioPlayer" preload="auto">
+                        <source src="https://dict.youdao.com/dictvoice?le=zh&amp;audio=您好！您所查询的是正牌产品，请放心使用，感谢您的大力支持！" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+        <img src="./static/z.jpg" style="width: 100%; display: block;">
+        </div>
+        <div class="container">
+            <div>指纹防伪</div>
+            <div class="center" style="text-align: center; margin-bottom: 15px;">
+                <div class="center2" style="width: 100px; height: 100px;">
+                    <img src="./static/4.png" style="display: block; width: 100%;
+                    height: 100%;">
+                </div>
+            </div> 
+        </div> 
+    </div>
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progress = document.getElementById('progress');
+        const timeline = document.getElementById('timeline');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+
+        function togglePlayPause() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3E%3Cpath d=\'M6 19h4V5H6v14zm8-14v14h4V5h-4z\'/%3E%3C/svg%3E")';
+            } else {
+                audio.pause();
+                playPauseBtn.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3E%3Cpath d=\'M8 5v14l11-7z\'/%3E%3C/svg%3E")';
+            }
+        }
+
+        playPauseBtn.addEventListener('click', togglePlayPause);
+
+        audio.addEventListener('timeupdate', () => {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = `${percent}%`;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('ended', () => {
+            playPauseBtn.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3E%3Cpath d=\'M8 5v14l11-7z\'/%3E%3C/svg%3E")';
+        });
+
+        timeline.addEventListener('click', (e) => {
+            const timelineWidth = window.getComputedStyle(timeline).width;
+            const timeToSeek = e.offsetX / parseInt(timelineWidth) * audio.duration;
+            audio.currentTime = timeToSeek;
+        });
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Initially set play button
+        playPauseBtn.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3E%3Cpath d=\'M8 5v14l11-7z\'/%3E%3C/svg%3E")';
+        audio.load();
+    </script>
+</body>
+</html>
